@@ -1,0 +1,39 @@
+
+targets:
+  - name: This Week List
+    trello:
+      token: '{{ env.Getenv "TRELLO_TOKEN" }}'
+      application-id: '{{ env.Getenv "TRELLO_APP_ID" }}'
+      board-id: '{{ env.Getenv "TRELLO_BOARD_ID" }}'
+      list-id: '{{ env.Getenv "TRELLO_LIST_ID" }}'
+      card:
+        title: 'Listen to: {{ .item.title }}'
+        description: "Link: {{ .item.link }}\nDescription: {{ .item.description }}"
+        labels:
+          - 5cdafec7c65fab3704aaf9bc
+          - 5cdafe82e540515e358d86e1
+
+
+rss:
+- name: Peleg
+  url: https://greatgame.blog/feed/peleg
+  auth:
+    username: '{{ env.Getenv "PELEG_USERNAME" }}'
+    password: '{{ env.Getenv "PELEG_PASSWORD" }}'
+  filter:
+    # only items that been released in the last 24 hours
+    just-released: '{{ ((time.Now).Add (time.Hour -24)).Before (time.Parse "2006-01-02T15:04:05Z" .item.publishedParsed) }}'
+- name: Making History
+  url: https://www.ranlevi.com/feed/mh_network_feed
+  filter:
+    # only items that been released in the last 24 hours
+    just-released: '{{ ((time.Now).Add (time.Hour -24)).Before (time.Parse "Mon, 02 Jan 2006 15:04:05 -0700" .item.published) }}'
+    
+
+bindings:
+- name: Making History
+  rss: Making History
+  target: This Week List
+- name: Peleg
+  rss: Peleg
+  target: This Week List
