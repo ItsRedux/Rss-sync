@@ -19,14 +19,12 @@ require (
 	github.com/mmcdole/gofeed v1.0.0-beta2
 	github.com/mmcdole/goxpp v0.0.0-20181012175147-0068e33feabf // indirect
 	github.com/open-integration/core v0.58.0
-	github.com/open-integration/service-catalog/http v0.0.0
+	github.com/open-integration/service-catalog/http v0.0.1
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/zealic/xignore v0.3.3 // indirect
 	gopkg.in/hairyhenderson/yaml.v2 v2.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/yaml.v2 v2.2.8
 	gotest.tools v2.2.0+incompatible // indirect
 )
-
-replace github.com/open-integration/service-catalog/http => ../../open-integration/service-catalog/http
 
 replace gopkg.in/hairyhenderson/yaml.v2 => github.com/maxaudron/yaml v0.0.0-20190411130442-27c13492fe3c

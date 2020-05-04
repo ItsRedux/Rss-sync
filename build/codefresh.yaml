@@ -1,0 +1,21 @@
+version: '1.0'
+
+steps:
+
+  CloneRSSSync:
+    type: git-clone
+    repo: olegsu/rss-sync
+    git: cf_github
+    revision: ${{CF_REVISION}}
+
+  Build:
+    type: build
+    image_name: olsynt/rss-sync
+    tag: ${{CF_REVISION}}
+    working_directory: ${{CloneRSSSync}}
+
+  Push:
+    type: push
+    candidate: ${{Build}}
+    tag: latest
+    image_name: olsynt/rss-sync
