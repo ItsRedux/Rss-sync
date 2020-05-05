@@ -23,7 +23,7 @@ targets:
       board-id: '{{ env.Getenv "TRELLO_BOARD_ID" }}'
       list-id: '{{ env.Getenv "TRELLO_LIST_ID" }}'
       card:
-        title: 'Listen to: {{ .item.title }}'
+        title: '[{{ .rss.name }}] Listen to: {{ .item.title }}'
         description: "Link: {{ .item.link }}\nDescription: {{ .item.description }}"
         labels:
           - 5cdafec7c65fab3704aaf9bc

@@ -14,8 +14,10 @@ import (
 
 type (
 	taskCandidate struct {
-		target Target
-		items  []gofeed.Item
+		target  Target
+		binding Binding
+		rss     RSS
+		items   []gofeed.Item
 	}
 )
 
@@ -114,6 +116,7 @@ func main() {
 								}
 								rssname = b.RSS
 								targetname = b.Target
+								taskCandidate.binding = b
 							}
 
 							for _, t := range cnf.Targets {
@@ -129,6 +132,7 @@ func main() {
 									continue
 								}
 								rss = r
+								taskCandidate.rss = r
 							}
 							matched := true
 							for _, f := range rss.Filter {
@@ -141,9 +145,15 @@ func main() {
 							}
 							taskCandidate.items = append(taskCandidate.items, *item)
 						}
+						targetValues := targetToJSON(&taskCandidate.target)
+						bindingValues := bindingToJSON(&taskCandidate.binding)
+						rssValues := rssToJSON(&taskCandidate.rss)
 						for i, item := range taskCandidate.items {
 							root := map[string]interface{}{}
 							root["item"] = gofeedItemToJSON(&item)
+							root["rss"] = rssValues
+							root["binding"] = bindingValues
+							root["target"] = targetValues
 							tasks = append(tasks, task.Task{
 								Metadata: task.Metadata{
 									Name: fmt.Sprintf("%d-created-card-%s", i, item.Title),

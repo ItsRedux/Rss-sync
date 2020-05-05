@@ -85,12 +85,40 @@ func getBindingNameFromTaskName(name string) string {
 }
 
 func gofeedItemToJSON(item *gofeed.Item) map[string]interface{} {
-	data := map[string]interface{}{}
 	b, err := json.Marshal(item)
 	if err != nil {
-		return data
+		return nil
 	}
-	if err := json.Unmarshal(b, &data); err != nil {
+	return toJSON(b)
+}
+
+func rssToJSON(rss *RSS) map[string]interface{} {
+	b, err := json.Marshal(rss)
+	if err != nil {
+		return nil
+	}
+	return toJSON(b)
+}
+
+func bindingToJSON(binding *Binding) map[string]interface{} {
+	b, err := json.Marshal(binding)
+	if err != nil {
+		return nil
+	}
+	return toJSON(b)
+}
+
+func targetToJSON(target *Target) map[string]interface{} {
+	b, err := json.Marshal(target)
+	if err != nil {
+		return nil
+	}
+	return toJSON(b)
+}
+
+func toJSON(input []byte) map[string]interface{} {
+	data := map[string]interface{}{}
+	if err := json.Unmarshal(input, &data); err != nil {
 		return data
 	}
 	return data
