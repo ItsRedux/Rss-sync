@@ -1,3 +1,19 @@
+bindings:
+- name: Making-History
+  rss: Making-History
+  target: This Week List
+- name: Peleg
+  rss: Peleg
+  target: This Week List
+- name: Hayot-Kiss
+  rss: Hayot-Kiss
+  target: This Week List
+- name: The-Great-Game
+  rss: The-Great-Game
+  target: This Week List
+- name: Propdo
+  rss: Propdo
+  target: This Week List
 
 targets:
   - name: This Week List
@@ -13,6 +29,10 @@ targets:
           - 5cdafec7c65fab3704aaf9bc
           - 5cdafe82e540515e358d86e1
 
+filters:
+  - &just-released-RFC1123 '{{ ((time.Now).Add (time.Hour -24)).Before (time.Parse "Mon, 02 Jan 2006 15:04:05 MST" .item.published) }}'
+  - &just-released-RFC1123Z '{{ ((time.Now).Add (time.Hour -24)).Before (time.Parse "Mon, 02 Jan 2006 15:04:05 -0700" .item.published) }}'
+  - &just-released-RFC3339 '{{ ((time.Now).Add (time.Hour -24)).Before (time.Parse "2006-01-02T15:04:05Z" .item.publishedParsed) }}'
 
 rss:
 - name: Peleg
@@ -21,19 +41,20 @@ rss:
     username: '{{ env.Getenv "PELEG_USERNAME" }}'
     password: '{{ env.Getenv "PELEG_PASSWORD" }}'
   filter:
-    # only items that been released in the last 24 hours
-    just-released: '{{ ((time.Now).Add (time.Hour -24)).Before (time.Parse "2006-01-02T15:04:05Z" .item.publishedParsed) }}'
-- name: Making History
+    just-released: *just-released-RFC3339
+- name: Making-History
   url: https://www.ranlevi.com/feed/mh_network_feed
   filter:
-    # only items that been released in the last 24 hours
-    just-released: '{{ ((time.Now).Add (time.Hour -24)).Before (time.Parse "Mon, 02 Jan 2006 15:04:05 -0700" .item.published) }}'
-    
-
-bindings:
-- name: Making History
-  rss: Making History
-  target: This Week List
-- name: Peleg
-  rss: Peleg
-  target: This Week List
+    just-released: *just-released-RFC1123Z
+- name: Hayot-Kiss
+  url: https://www.omnycontent.com/d/playlist/23f697a0-7e6a-4e96-a223-a82c00962b12/dbe32976-5401-4c93-87ed-a919008d58ae/1ea69f94-8d46-4ff2-aaca-a919008d58b8/podcast.rss
+  filter:
+    just-released: *just-released-RFC1123Z
+- name: The-Great-Game
+  url: https://greatgame.blog/feed/
+  filter:
+    just-released: *just-released-RFC1123Z
+- name: Propdo
+  url: https://anchor.fm/s/84ee848/podcast/rss
+  filter:
+    just-released: *just-released-RFC1123
