@@ -5,7 +5,12 @@ I use it as to sync my favourite podcasts and add them to my Trello board so I d
 
 
 * The input to the program is `feed.yaml` file that describes the rss, targets and the binding between them [FEED].
-* It uses go template as templat engine together with [gomplate](https://docs.gomplate.ca/) to extend the functionality 
+* It uses go template as templat engine together with [gomplate](https://docs.gomplate.ca/) to extend the functionality
+  * {{ .item }} - to access the current rss item that matched to the filters
+  * {{ .rss }} - to access the rss from `feed.yaml`
+  * {{ .binding }} - to access the binding from `feed.yaml`
+  * {{ .target }} - to access the target from `feed.yaml`
+  * {{ .feed }} - to access the feed tol level properties as it parsed using [gofeed](github.com/mmcdole/gofeed) (items are removed)
 * open-integration pipeline - [read more](https://dev.to/olegsu/continuous-automation-with-open-integration-4f5a) about open-intergration 
 
 
@@ -26,8 +31,8 @@ targets:
     
     # Data about the card to be created
     card:
-        title: 'Listen to: {{ .item.title }}'
-        description: "Link: {{ .item.link }}\nDescription: {{ .item.description }}"
+        title: '[{{ .rss.name }}] Listen to: {{ .item.title }}'
+        description: "{{ .feed.title }}\nLink: {{ .item.link }}\nDescription: {{ .item.description }}"
         # Lables ID's
         labels: []
 

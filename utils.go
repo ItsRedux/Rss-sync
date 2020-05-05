@@ -49,7 +49,7 @@ func buildURL(rss RSS) (string, error) {
 	return u.String(), nil
 }
 
-func filter(item *gofeed.Item, filter string) bool {
+func filter(item gofeed.Item, filter string) bool {
 	root := map[string]interface{}{}
 	root["item"] = gofeedItemToJSON(item)
 	out := templateString(&filter, root)
@@ -84,7 +84,7 @@ func getBindingNameFromTaskName(name string) string {
 	return strings.Split(name, seperator)[0]
 }
 
-func gofeedItemToJSON(item *gofeed.Item) map[string]interface{} {
+func gofeedItemToJSON(item gofeed.Item) map[string]interface{} {
 	b, err := json.Marshal(item)
 	if err != nil {
 		return nil
@@ -92,7 +92,7 @@ func gofeedItemToJSON(item *gofeed.Item) map[string]interface{} {
 	return toJSON(b)
 }
 
-func rssToJSON(rss *RSS) map[string]interface{} {
+func rssToJSON(rss RSS) map[string]interface{} {
 	b, err := json.Marshal(rss)
 	if err != nil {
 		return nil
@@ -100,7 +100,7 @@ func rssToJSON(rss *RSS) map[string]interface{} {
 	return toJSON(b)
 }
 
-func bindingToJSON(binding *Binding) map[string]interface{} {
+func bindingToJSON(binding Binding) map[string]interface{} {
 	b, err := json.Marshal(binding)
 	if err != nil {
 		return nil
@@ -108,8 +108,17 @@ func bindingToJSON(binding *Binding) map[string]interface{} {
 	return toJSON(b)
 }
 
-func targetToJSON(target *Target) map[string]interface{} {
+func targetToJSON(target Target) map[string]interface{} {
 	b, err := json.Marshal(target)
+	if err != nil {
+		return nil
+	}
+	return toJSON(b)
+}
+
+func feedToJSON(feed gofeed.Feed) map[string]interface{} {
+	feed.Items = []*gofeed.Item{}
+	b, err := json.Marshal(feed)
 	if err != nil {
 		return nil
 	}

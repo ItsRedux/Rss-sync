@@ -136,7 +136,7 @@ func main() {
 							}
 							matched := true
 							for _, f := range rss.Filter {
-								if res := filter(item, f); !res {
+								if res := filter(*item, f); !res {
 									matched = false
 								}
 							}
@@ -145,15 +145,17 @@ func main() {
 							}
 							taskCandidate.items = append(taskCandidate.items, *item)
 						}
-						targetValues := targetToJSON(&taskCandidate.target)
-						bindingValues := bindingToJSON(&taskCandidate.binding)
-						rssValues := rssToJSON(&taskCandidate.rss)
+						targetValues := targetToJSON(taskCandidate.target)
+						bindingValues := bindingToJSON(taskCandidate.binding)
+						rssValues := rssToJSON(taskCandidate.rss)
+						feedValues := feedToJSON(*feed)
 						for i, item := range taskCandidate.items {
 							root := map[string]interface{}{}
-							root["item"] = gofeedItemToJSON(&item)
+							root["item"] = gofeedItemToJSON(item)
 							root["rss"] = rssValues
 							root["binding"] = bindingValues
 							root["target"] = targetValues
+							root["feed"] = feedValues
 							tasks = append(tasks, task.Task{
 								Metadata: task.Metadata{
 									Name: fmt.Sprintf("%d-created-card-%s", i, item.Title),

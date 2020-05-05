@@ -24,7 +24,7 @@ targets:
       list-id: '{{ env.Getenv "TRELLO_LIST_ID" }}'
       card:
         title: '[{{ .rss.name }}] Listen to: {{ .item.title }}'
-        description: "Link: {{ .item.link }}\nDescription: {{ .item.description }}"
+        description: "{{ .feed.title }}\nLink: {{ .item.link }}\nDescription: {{ .item.description }}"
         labels:
           - 5cdafec7c65fab3704aaf9bc
           - 5cdafe82e540515e358d86e1
