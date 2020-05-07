@@ -8,6 +8,28 @@ steps:
     git: cf_github
     revision: ${{CF_REVISION}}
 
+  CreateGitTag:
+    title: Push tag to git
+    image: codefresh/cli
+    stage: Release
+    commands:
+    - export VERSION=$(cat VERSION)
+    - export OLD_ORIGIN=$(git remote get-url origin)
+    - git remote rm origin
+    - git remote add origin https://${{GITHUB_TOKEN}}@github.com/olegsu/rss-sync.git
+    - git tag $VERSION
+    - git push --tags
+    - git remote rm origin
+    - git remote add origin $OLD_ORIGIN
+  
+  ReleaseBinaries:
+    title: Create release in Github
+    image: goreleaser/goreleaser
+    stage: Release
+    fail_fast: false
+    commands:
+    - goreleaser release -f .goreleaser.yml --rm-dist --skip-validate
+
   Build:
     type: build
     image_name: olsynt/rss-sync

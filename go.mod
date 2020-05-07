@@ -1,4 +1,4 @@
-module rss-sync
+module github.com/olegsu/rss-sync
 
 go 1.14
 
