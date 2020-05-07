@@ -11,7 +11,6 @@ steps:
   CreateGitTag:
     title: Push tag to git
     image: codefresh/cli
-    stage: Release
     commands:
     - export VERSION=$(cat VERSION)
     - export OLD_ORIGIN=$(git remote get-url origin)
@@ -25,7 +24,6 @@ steps:
   ReleaseBinaries:
     title: Create release in Github
     image: goreleaser/goreleaser
-    stage: Release
     fail_fast: false
     commands:
     - goreleaser release -f .goreleaser.yml --rm-dist --skip-validate
