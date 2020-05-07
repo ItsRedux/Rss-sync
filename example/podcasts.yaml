@@ -1,7 +1,4 @@
 bindings:
-- name: Making-History
-  rss: Making-History
-  target: This Week List
 - name: Peleg
   rss: Peleg
   target: This Week List
@@ -42,10 +39,6 @@ rss:
     password: '{{ env.Getenv "PELEG_PASSWORD" }}'
   filter:
     just-released: *just-released-RFC3339
-- name: Making-History
-  url: https://www.ranlevi.com/feed/mh_network_feed
-  filter:
-    just-released: *just-released-RFC1123Z
 - name: Hayot-Kiss
   url: https://www.omnycontent.com/d/playlist/23f697a0-7e6a-4e96-a223-a82c00962b12/dbe32976-5401-4c93-87ed-a919008d58ae/1ea69f94-8d46-4ff2-aaca-a919008d58b8/podcast.rss
   filter:
