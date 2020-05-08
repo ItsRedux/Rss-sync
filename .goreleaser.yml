@@ -5,7 +5,6 @@ before:
 builds:
 - goos:
   - linux
-  - windows
   - darwin
   goarch:
   - amd64
@@ -18,7 +17,6 @@ archives:
   replacements:
     darwin: Darwin
     linux: Linux
-    windows: Windows
     386: i386
     amd64: x86_64
   name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
