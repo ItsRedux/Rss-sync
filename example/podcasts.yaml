@@ -16,7 +16,7 @@ targets:
   - name: This Week List
     trello:
       token: '{{ env.Getenv "TRELLO_TOKEN" }}'
-      application-id: '{{ env.Getenv "TRELLO_APP_ID" }}'
+      key: '{{ env.Getenv "TRELLO_KEY" }}'
       board-id: '{{ env.Getenv "TRELLO_BOARD_ID" }}'
       list-id: '{{ env.Getenv "TRELLO_LIST_ID" }}'
       card:

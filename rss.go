@@ -10,11 +10,11 @@ type (
 	Target struct {
 		Name   string `json:"name" yaml:"name"`
 		Trello *struct {
-			Token         string `json:"token" yaml:"token"`
-			ApplicationID string `json:"application-id" yaml:"application-id"`
-			BoardID       string `json:"board-id" yaml:"board-id"`
-			ListID        string `json:"list-id" yaml:"list-id"`
-			Card          *struct {
+			Token   string `json:"token" yaml:"token"`
+			Key     string `json:"key" yaml:"key"`
+			BoardID string `json:"board-id" yaml:"board-id"`
+			ListID  string `json:"list-id" yaml:"list-id"`
+			Card    *struct {
 				Title       *string  `json:"title,omitempty" yaml:"title,omitempty"`
 				Description *string  `json:"description,omitempty" yaml:"description,omitempty"`
 				Labels      []string `json:"labels" yaml:"labels"`

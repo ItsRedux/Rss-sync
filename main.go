@@ -166,7 +166,7 @@ func main() {
 									Arguments: []task.Argument{
 										{
 											Key:   "App",
-											Value: templateString(&taskCandidate.target.Trello.ApplicationID, nil),
+											Value: templateString(&taskCandidate.target.Trello.Key, nil),
 										},
 										{
 											Key:   "Token",
