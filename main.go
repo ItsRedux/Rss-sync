@@ -58,7 +58,7 @@ func main() {
 								if src.RSS == nil {
 									continue
 								}
-								if src.Name != binding.RSS {
+								if src.Name != binding.Source {
 									continue
 								}
 								u, err := buildURL(src)
@@ -117,7 +117,7 @@ func main() {
 								if b.Name != name {
 									continue
 								}
-								rssname = b.RSS
+								rssname = b.Source
 								targetname = b.Target
 								taskCandidate.binding = b
 							}

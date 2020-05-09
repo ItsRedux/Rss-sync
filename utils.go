@@ -77,7 +77,7 @@ func templateStringArray(tmpls []string) []string {
 }
 
 func buildTaskName(binding Binding) string {
-	return fmt.Sprintf("%s%s%s", binding.Name, seperator, binding.RSS)
+	return fmt.Sprintf("%s%s%s", binding.Name, seperator, binding.Source)
 }
 
 func getBindingNameFromTaskName(name string) string {

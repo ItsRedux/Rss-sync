@@ -1,15 +1,15 @@
 bindings:
 - name: Peleg
-  rss: Peleg
+  source: Peleg
   target: This Week List
 - name: Hayot-Kiss
-  rss: Hayot-Kiss
+  source: Hayot-Kiss
   target: This Week List
 - name: The-Great-Game
-  rss: The-Great-Game
+  source: The-Great-Game
   target: This Week List
 - name: Propdo
-  rss: Propdo
+  source: Propdo
   target: This Week List
 
 targets:

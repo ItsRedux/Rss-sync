@@ -36,7 +36,7 @@ type (
 
 	Binding struct {
 		Name   string `json:"name" yaml:"name"`
-		RSS    string `json:"rss" yaml:"rss"`
+		Source string `json:"source" yaml:"source"`
 		Target string `json:"target" yaml:"target"`
 	}
 )
