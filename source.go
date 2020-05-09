@@ -3,7 +3,7 @@ package main
 type (
 	Config struct {
 		Targets  []Target  `json:"targets" yaml:"targets"`
-		RSS      []RSS     `json:"rss" yaml:"rss"`
+		Sources  []Source  `json:"sources" yaml:"sources"`
 		Bindings []Binding `json:"bindings" yaml:"bindings"`
 	}
 
@@ -22,13 +22,15 @@ type (
 		} `json:"trello,omitempty" yaml:"trello,omitempty"`
 	}
 
-	RSS struct {
+	Source struct {
 		Name string `json:"name" yaml:"name"`
-		URL  string `json:"url" yaml:"url"`
-		Auth *struct {
-			Username string `json:"username" yaml:"username"`
-			Password string `json:"password" yaml:"password"`
-		} `json:"auth" yaml:"auth"`
+		RSS  *struct {
+			URL  string `json:"url" yaml:"url"`
+			Auth *struct {
+				Username string `json:"username" yaml:"username"`
+				Password string `json:"password" yaml:"password"`
+			} `json:"auth" yaml:"auth"`
+		} `json:"rss,omitempty" yaml:"rss,omitempty"`
 		Filter map[string]string `json:"filter" yaml:"filter"`
 	}
 

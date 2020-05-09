@@ -38,13 +38,13 @@ func dieOnError(err error) {
 	}
 }
 
-func buildURL(rss RSS) (string, error) {
-	u, err := url.Parse(rss.URL)
+func buildURL(src Source) (string, error) {
+	u, err := url.Parse(src.RSS.URL)
 	if err != nil {
 		return "", err
 	}
-	if rss.Auth != nil {
-		u.User = url.UserPassword(templateString(&rss.Auth.Username, nil), templateString(&rss.Auth.Password, nil))
+	if src.RSS.Auth != nil {
+		u.User = url.UserPassword(templateString(&src.RSS.Auth.Username, nil), templateString(&src.RSS.Auth.Password, nil))
 	}
 	return u.String(), nil
 }
@@ -92,8 +92,8 @@ func gofeedItemToJSON(item gofeed.Item) map[string]interface{} {
 	return toJSON(b)
 }
 
-func rssToJSON(rss RSS) map[string]interface{} {
-	b, err := json.Marshal(rss)
+func srcToJSON(src Source) map[string]interface{} {
+	b, err := json.Marshal(src)
 	if err != nil {
 		return nil
 	}

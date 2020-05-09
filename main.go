@@ -16,7 +16,7 @@ type (
 	taskCandidate struct {
 		target  Target
 		binding Binding
-		rss     RSS
+		src     Source
 		items   []gofeed.Item
 	}
 )
@@ -54,11 +54,14 @@ func main() {
 					Reaction: func(ev state.Event, state state.State) []task.Task {
 						tasks := []task.Task{}
 						for _, binding := range cnf.Bindings {
-							for _, rss := range cnf.RSS {
-								if rss.Name != binding.RSS {
+							for _, src := range cnf.Sources {
+								if src.RSS == nil {
 									continue
 								}
-								u, err := buildURL(rss)
+								if src.Name != binding.RSS {
+									continue
+								}
+								u, err := buildURL(src)
 								if err != nil {
 									return nil
 								}
@@ -126,16 +129,16 @@ func main() {
 								taskCandidate.target = t
 							}
 
-							var rss RSS
-							for _, r := range cnf.RSS {
-								if r.Name != rssname {
+							var src Source
+							for _, s := range cnf.Sources {
+								if s.Name != rssname {
 									continue
 								}
-								rss = r
-								taskCandidate.rss = r
+								src = s
+								taskCandidate.src = s
 							}
 							matched := true
-							for _, f := range rss.Filter {
+							for _, f := range src.Filter {
 								if res := filter(*item, f); !res {
 									matched = false
 								}
@@ -147,12 +150,12 @@ func main() {
 						}
 						targetValues := targetToJSON(taskCandidate.target)
 						bindingValues := bindingToJSON(taskCandidate.binding)
-						rssValues := rssToJSON(taskCandidate.rss)
+						srcValues := srcToJSON(taskCandidate.src)
 						feedValues := feedToJSON(*feed)
 						for i, item := range taskCandidate.items {
 							root := map[string]interface{}{}
 							root["item"] = gofeedItemToJSON(item)
-							root["rss"] = rssValues
+							root["source"] = srcValues
 							root["binding"] = bindingValues
 							root["target"] = targetValues
 							root["feed"] = feedValues
