@@ -37,7 +37,7 @@ targets:
         labels: []
 
 
-rss:
+sources:
 # Unique name of the target
 - name: Making History
   # RSS feed url 
