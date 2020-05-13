@@ -1,7 +1,13 @@
 package main
 
+import "errors"
+
+var (
+	errNotFound = errors.New("Not found")
+)
+
 type (
-	Config struct {
+	Sync struct {
 		Targets  []Target  `json:"targets" yaml:"targets"`
 		Sources  []Source  `json:"sources" yaml:"sources"`
 		Bindings []Binding `json:"bindings" yaml:"bindings"`
@@ -31,6 +37,10 @@ type (
 				Password string `json:"password" yaml:"password"`
 			} `json:"auth" yaml:"auth"`
 		} `json:"rss,omitempty" yaml:"rss,omitempty"`
+		JSON *struct {
+			URL  string `json:"url" yaml:"url"`
+			Type string `json:"type" yaml:"type"`
+		} `json:"json,omitempty" yaml:"json,omitempty"`
 		Filter map[string]string `json:"filter" yaml:"filter"`
 	}
 
@@ -40,3 +50,32 @@ type (
 		Target string `json:"target" yaml:"target"`
 	}
 )
+
+func getBinding(name string, list []Binding) (Binding, error) {
+	for _, b := range list {
+		if b.Name == name {
+			return b, nil
+		}
+	}
+
+	return Binding{}, errNotFound
+}
+
+func getSource(name string, list []Source) (Source, error) {
+	for _, b := range list {
+		if b.Name == name {
+			return b, nil
+		}
+	}
+
+	return Source{}, errNotFound
+}
+
+func getTarget(name string, list []Target) (Target, error) {
+	for _, b := range list {
+		if b.Name == name {
+			return b, nil
+		}
+	}
+	return Target{}, errNotFound
+}

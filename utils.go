@@ -19,12 +19,12 @@ const (
 	seperator = ":::"
 )
 
-func readFile(location string) (Config, error) {
+func readFile(location string) (Sync, error) {
 	bytes, err := ioutil.ReadFile(location)
 	if err != nil {
-		return Config{}, err
+		return Sync{}, err
 	}
-	cnf := Config{}
+	cnf := Sync{}
 	if err := yaml.Unmarshal(bytes, &cnf); err != nil {
 		return cnf, err
 	}
@@ -33,26 +33,24 @@ func readFile(location string) (Config, error) {
 
 func dieOnError(err error) {
 	if err != nil {
-		fmt.Printf("[Error] %s", err.Error())
+		fmt.Printf("[Error] %s\n", err.Error())
 		os.Exit(1)
 	}
 }
 
-func buildURL(src Source) (string, error) {
-	u, err := url.Parse(src.RSS.URL)
+func buildURL(URL string, username string, password string) (string, error) {
+	u, err := url.Parse(URL)
 	if err != nil {
 		return "", err
 	}
-	if src.RSS.Auth != nil {
-		u.User = url.UserPassword(templateString(&src.RSS.Auth.Username, nil), templateString(&src.RSS.Auth.Password, nil))
+	if username != "" && password != "" {
+		u.User = url.UserPassword(templateString(&username, nil), templateString(&password, nil))
 	}
 	return u.String(), nil
 }
 
-func filter(item gofeed.Item, filter string) bool {
-	root := map[string]interface{}{}
-	root["item"] = gofeedItemToJSON(item)
-	out := templateString(&filter, root)
+func filter(data interface{}, filter string) bool {
+	out := templateString(&filter, data)
 	return out == "true"
 }
 
@@ -127,6 +125,13 @@ func feedToJSON(feed gofeed.Feed) map[string]interface{} {
 
 func toJSON(input []byte) map[string]interface{} {
 	data := map[string]interface{}{}
+	if err := json.Unmarshal(input, &data); err != nil {
+		return data
+	}
+	return data
+}
+func toArrayJSON(input []byte) []map[string]interface{} {
+	data := []map[string]interface{}{}
 	if err := json.Unmarshal(input, &data); err != nil {
 		return data
 	}
