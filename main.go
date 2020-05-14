@@ -247,9 +247,7 @@ func buildValues(taskCandidate taskCandidate) *values {
 func filterSource(taskCandidate taskCandidate, data interface{}) bool {
 	matched := true
 	for _, f := range taskCandidate.src.Filter {
-		fmt.Println(f)
 		if res := filter(data, f); !res {
-			fmt.Println(res)
 			matched = false
 		}
 	}
