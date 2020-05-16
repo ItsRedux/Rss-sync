@@ -1,31 +1,34 @@
 bindings:
 - name: Peleg
   source: Peleg
-  target: This Week List
+  target: Today
 - name: Hayot-Kiss
   source: Hayot-Kiss
-  target: This Week List
+  target: Today
 - name: The-Great-Game
   source: The-Great-Game
-  target: This Week List
+  target: Today
 - name: Propdo
   source: Propdo
-  target: This Week List
+  target: Today
 - name: Making-History
   source: Making-History
-  target: This Week List
+  target: Today
 - name: Hatshova
   source: Hatshova
-  target: This Week List
+  target: Today
 - name: Making-Software
   source: Making-Software
-  target: This Week List
+  target: Today
 - name: Kubernetes
   source: Kubernetes
-  target: This Week List
+  target: Today
+- name: Calcalist
+  source: Calcalist
+  target: Today
 
 targets:
-  - name: This Week List
+  - name: Today
     trello:
       token: '{{ env.Getenv "TRELLO_TOKEN" }}'
       key: '{{ env.Getenv "TRELLO_KEY" }}'
@@ -85,5 +88,10 @@ sources:
 - name: Kubernetes
   rss:
     url: https://kubernetespodcast.com/feeds/audio.xml
+  filter:
+    just-released: *just-released-RFC1123Z
+- name: Calcalist
+  rss:
+    url: https://www.omnycontent.com/d/playlist/178d72a7-a889-4132-8008-a5cc014ed109/874bd0b7-699f-41ce-bb29-a96f00acd9c5/e187fae7-3db8-4cde-8b39-a96f00cd338c/podcast.rss
   filter:
     just-released: *just-released-RFC1123Z
