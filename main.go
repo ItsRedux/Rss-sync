@@ -139,7 +139,7 @@ func reactToRSSCompletedTask(cnf Sync) func(ev state.Event, state state.State) [
 			populateTaskCandidate(name, &taskCandidate, cnf)
 			data := buildValues(taskCandidate)
 			data.Add("item", gofeedItemToJSON(*item))
-			if filterSource(taskCandidate, data) {
+			if !filterSource(taskCandidate, data) {
 				continue
 			}
 			items = append(items, *item)
