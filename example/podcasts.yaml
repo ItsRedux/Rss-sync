@@ -20,6 +20,9 @@ bindings:
 - name: Making-Software
   source: Making-Software
   target: This Week List
+- name: Kubernetes
+  source: Kubernetes
+  target: This Week List
 
 targets:
   - name: This Week List
@@ -30,7 +33,7 @@ targets:
       list-id: '{{ env.Getenv "TRELLO_LIST_ID" }}'
       card:
         title: '[{{ .source.name }}] Listen to: {{ .item.title }}'
-        description: "{{ .feed.title }}\nLink: {{ .item.link }}\nDescription: {{ .item.description }}"
+        description: "{{ .feed.title }}\nLink: {{ .item.link }}"
         labels:
           - 5cdafec7c65fab3704aaf9bc
           - 5cdafe82e540515e358d86e1
@@ -65,14 +68,22 @@ sources:
   filter:
     just-released: *just-released-RFC1123
 - name: Making-History
-  url: https://www.spreaker.com/show/4227531/episodes/feed
+  rss:
+    url: https://www.spreaker.com/show/4227531/episodes/feed
   filter:
     just-released: *just-released-RFC1123Z
 - name: Hatshova
-  url: https://www.spreaker.com/show/4228834/episodes/feed
+  rss:
+    url: https://www.spreaker.com/show/4228834/episodes/feed
   filter:
     just-released: *just-released-RFC1123Z
 - name: Making-Software
-  url: https://www.spreaker.com/show/4221323/episodes/feed
+  rss:
+    url: https://www.spreaker.com/show/4221323/episodes/feed
+  filter:
+    just-released: *just-released-RFC1123Z
+- name: Kubernetes
+  rss:
+    url: https://kubernetespodcast.com/feeds/audio.xml
   filter:
     just-released: *just-released-RFC1123Z
