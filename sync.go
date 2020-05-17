@@ -41,6 +41,12 @@ type (
 			URL  string `json:"url" yaml:"url"`
 			Type string `json:"type" yaml:"type"`
 		} `json:"json,omitempty" yaml:"json,omitempty"`
+		JIRA *struct {
+			User     string `json:"user" yaml:"user"`
+			Token    string `json:"token" yaml:"token"`
+			Endpoint string `json:"endpoint" yaml:"endpoint"`
+			JQL      string `json:"jql" yaml:"jql"`
+		} `json:"jira,omitempty" yaml:"jira,omitempty"`
 		Filter map[string]string `json:"filter" yaml:"filter"`
 	}
 

@@ -12,6 +12,7 @@ import (
 
 	"github.com/hairyhenderson/gomplate"
 	"github.com/mmcdole/gofeed"
+	"github.com/open-integration/service-catalog/jira/pkg/endpoints/list"
 	"gopkg.in/yaml.v2"
 )
 
@@ -39,7 +40,7 @@ func dieOnError(err error) {
 }
 
 func buildURL(URL string, username string, password string) (string, error) {
-	u, err := url.Parse(URL)
+	u, err := url.Parse(templateString(&URL, nil))
 	if err != nil {
 		return "", err
 	}
@@ -51,6 +52,7 @@ func buildURL(URL string, username string, password string) (string, error) {
 
 func filter(data interface{}, filter string) bool {
 	out := templateString(&filter, data)
+	fmt.Println(out)
 	return out == "true"
 }
 
@@ -84,6 +86,14 @@ func getBindingNameFromTaskName(name string) string {
 
 func gofeedItemToJSON(item gofeed.Item) map[string]interface{} {
 	b, err := json.Marshal(item)
+	if err != nil {
+		return nil
+	}
+	return toJSON(b)
+}
+
+func jiraIssueToJSON(issue list.Issue) map[string]interface{} {
+	b, err := json.Marshal(issue)
 	if err != nil {
 		return nil
 	}

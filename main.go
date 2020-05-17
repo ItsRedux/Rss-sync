@@ -10,6 +10,7 @@ import (
 	"github.com/open-integration/core/pkg/state"
 	"github.com/open-integration/core/pkg/task"
 	"github.com/open-integration/service-catalog/http/pkg/endpoints/call"
+	"github.com/open-integration/service-catalog/jira/pkg/endpoints/list"
 )
 
 type (
@@ -17,6 +18,14 @@ type (
 		target  Target
 		binding Binding
 		src     Source
+	}
+
+	createJiraTaskOptions struct {
+		taskName string
+		token    string
+		endpoint string
+		user     string
+		jql      string
 	}
 )
 
@@ -29,6 +38,7 @@ func main() {
 	dieOnError(err)
 	conditionRSSTaskFinished := &TaskFinished{}
 	conditionJSONTaskFinished := &TaskFinished{}
+	conditionJIRATaskFinished := &TaskFinished{}
 
 	services := []core.Service{
 		{
@@ -40,6 +50,11 @@ func main() {
 			Name:    "trello",
 			Version: "0.10.0",
 			As:      "trello",
+		},
+		{
+			Name:    "jira",
+			Version: "0.1.0",
+			As:      "jira",
 		},
 	}
 	pipe := core.Pipeline{
@@ -56,7 +71,7 @@ func main() {
 						for _, binding := range cnf.Bindings {
 							src, err := getSource(binding.Source, cnf.Sources)
 							if err != nil {
-								dieOnError(fmt.Errorf("Source %s not found", binding.Source))
+								dieOnError(fmt.Errorf("Source \"%s\" not found", binding.Source))
 							}
 							name := buildTaskName(binding)
 
@@ -80,6 +95,20 @@ func main() {
 								tasks = append(tasks, buildHTTPTask(name, u))
 								continue
 							}
+
+							if src.JIRA != nil {
+								u, err := buildURL(src.JIRA.Endpoint, "", "")
+								dieOnError(err)
+								conditionJIRATaskFinished.AddTask(name)
+								tasks = append(tasks, createJiraTask(createJiraTaskOptions{
+									endpoint: u,
+									jql:      templateString(&src.JIRA.JQL, nil),
+									taskName: name,
+									token:    templateString(&src.JIRA.Token, nil),
+									user:     templateString(&src.JIRA.User, nil),
+								}))
+								continue
+							}
 						}
 						return tasks
 					},
@@ -91,6 +120,10 @@ func main() {
 				{
 					Condition: conditionJSONTaskFinished,
 					Reaction:  reactToJSONCompletedTask(cnf),
+				},
+				{
+					Condition: conditionJIRATaskFinished,
+					Reaction:  reactToJIRACompletedTask(cnf),
 				},
 			},
 		},
@@ -182,10 +215,35 @@ func reactToJSONCompletedTask(cnf Sync) func(ev state.Event, state state.State) 
 			for i, c := range content {
 				root.Add("content", c)
 				if !filterSource(taskCandidate, root) {
-					return nil
+					continue
 				}
 				tasks = append(tasks, createTrelloTask(fmt.Sprintf("%d-created-card-%s", i, ""), taskCandidate, root))
 			}
+		}
+		return tasks
+	}
+}
+
+func reactToJIRACompletedTask(cnf Sync) func(ev state.Event, state state.State) []task.Task {
+	return func(ev state.Event, state state.State) []task.Task {
+		tasks := []task.Task{}
+		res := &list.ListReturns{}
+		err := json.Unmarshal([]byte(state.Tasks()[ev.Metadata.Task].Output), res)
+		dieOnError(err)
+
+		taskCandidate := taskCandidate{}
+
+		name := getBindingNameFromTaskName(ev.Metadata.Task)
+
+		populateTaskCandidate(name, &taskCandidate, cnf)
+
+		root := buildValues(taskCandidate)
+		for i, issue := range res.Issues {
+			root.Add("issue", jiraIssueToJSON(issue))
+			if !filterSource(taskCandidate, root) {
+				return nil
+			}
+			tasks = append(tasks, createTrelloTask(fmt.Sprintf("%d-created-card-%s", i, name), taskCandidate, root))
 		}
 		return tasks
 	}
@@ -227,6 +285,40 @@ func createTrelloTask(name string, taskCandidate taskCandidate, data interface{}
 				{
 					Key:   "Labels",
 					Value: templateStringArray(taskCandidate.target.Trello.Card.Labels),
+				},
+			},
+		},
+	}
+}
+
+func createJiraTask(options createJiraTaskOptions) task.Task {
+	return task.Task{
+		Metadata: task.Metadata{
+			Name: options.taskName,
+		},
+		Spec: task.Spec{
+			Service:  "jira",
+			Endpoint: "list",
+			Arguments: []task.Argument{
+				{
+					Key:   "API_Token",
+					Value: options.token,
+				},
+				{
+					Key:   "Endpoint",
+					Value: options.endpoint,
+				},
+				{
+					Key:   "User",
+					Value: options.user,
+				},
+				{
+					Key:   "JQL",
+					Value: options.jql,
+				},
+				{
+					Key:   "QueryFields",
+					Value: "*all",
 				},
 			},
 		},
