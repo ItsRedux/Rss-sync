@@ -1,0 +1,50 @@
+bindings:
+- name: Mentioned
+  source: Mentioned
+  target: Mentioned
+- name: Watching
+  source: Watching
+  target: Watching
+
+trello: &trello
+  token: '{{ env.Getenv "TRELLO_TOKEN" }}'
+  key: '{{ env.Getenv "TRELLO_KEY" }}'
+  board-id: '{{ env.Getenv "TRELLO_BOARD_ID" }}'
+  list-id: '{{ env.Getenv "TRELLO_LIST_ID" }}'
+  card:
+    description: |
+      Link: {{ env.Getenv "JIRA_ENDPOINT" }}/browse/{{ .issue.key }}
+      {{ if .issue.fields }}
+      {{ if .issue.fields.description }}
+      Description:
+      {{ .issue.fields.description | strings.Trunc 5000  }}
+      {{end}}
+      {{ end }}
+    labels:
+      - 5cdafe92e62c1855c4ce9ae2
+
+targets:
+  - name: Mentioned
+    trello:
+      <<: *trello
+      card:
+        title: 'Mentioned in: "{{ .issue.key }}"'
+  - name: Watching
+    trello:
+      <<: *trello
+      card:
+        title: 'Watching: "{{ .issue.key }}"'
+
+sources:
+- name: Mentioned
+  jira:
+    user: '{{ env.Getenv "JIRA_USER" }}'
+    token: '{{ env.Getenv "JIRA_TOKEN" }}'
+    endpoint: '{{ env.Getenv "JIRA_ENDPOINT" }}'
+    jql: 'status != Done AND (comment ~ currentUser() OR description ~ currentUser()) AND updatedDate > startOfDay(-1)'
+- name: Watching
+  jira:
+    user: '{{ env.Getenv "JIRA_USER" }}'
+    token: '{{ env.Getenv "JIRA_TOKEN" }}'
+    endpoint: '{{ env.Getenv "JIRA_ENDPOINT" }}'
+    jql: 'status != Done AND watcher = currentUser() AND updatedDate > startOfDay(-1)'

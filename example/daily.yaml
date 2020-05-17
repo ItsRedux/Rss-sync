@@ -1,0 +1,25 @@
+bindings:
+- name: Recuurent Tasks
+  source: Recuurent Tasks
+  target: Today List
+
+targets:
+  - name: Today List
+    trello:
+      token: '{{ env.Getenv "TRELLO_TOKEN" }}'
+      key: '{{ env.Getenv "TRELLO_KEY" }}'
+      board-id: '{{ env.Getenv "TRELLO_BOARD_ID" }}'
+      list-id: '{{ env.Getenv "TRELLO_LIST_ID" }}'
+      card:
+        title: 'Reccurent task: "{{ .content.name }}"'
+        description: '...'
+        labels:
+          - 5cdafec7c65fab3704aaf9bc
+
+sources:
+- name: Recuurent Tasks
+  json:
+    url: '{{ env.Getenv "RECCURENT_TASKS_URL" }}'
+    type: array
+  filter:
+    days: '{{ if has .content.days ((time.Now).Format "Mon") }}true{{else}}false{{end}}'
