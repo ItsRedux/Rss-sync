@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/mmcdole/gofeed"
 	"github.com/open-integration/core"
@@ -30,108 +31,105 @@ type (
 )
 
 func main() {
-	p := os.Getenv("FEED")
-	if p == "" {
-		dieOnError(fmt.Errorf("File not provided"))
-	}
-	cnf, err := readFile(p)
-	dieOnError(err)
-	conditionRSSTaskFinished := &TaskFinished{}
-	conditionJSONTaskFinished := &TaskFinished{}
-	conditionJIRATaskFinished := &TaskFinished{}
-
-	services := []core.Service{
-		{
-			As:      "http",
-			Name:    "http",
-			Version: "0.0.1",
-		},
-		{
-			Name:    "trello",
-			Version: "0.10.0",
-			As:      "trello",
-		},
-		{
-			Name:    "jira",
-			Version: "0.1.0",
-			As:      "jira",
-		},
-	}
-	pipe := core.Pipeline{
-		Metadata: core.PipelineMetadata{
-			Name: "sync",
-		},
-		Spec: core.PipelineSpec{
-			Services: services,
-			Reactions: []core.EventReaction{
-				{
-					Condition: core.ConditionEngineStarted(),
-					Reaction: func(ev state.Event, state state.State) []task.Task {
-						tasks := []task.Task{}
-						for _, binding := range cnf.Bindings {
-							src, err := getSource(binding.Source, cnf.Sources)
-							if err != nil {
-								dieOnError(fmt.Errorf("Source \"%s\" not found", binding.Source))
-							}
-							name := buildTaskName(binding)
-
-							if src.RSS != nil {
-								username, password := "", ""
-								if src.RSS.Auth != nil {
-									username = src.RSS.Auth.Username
-									password = src.RSS.Auth.Password
+	syncs := readSyncFiles()
+	for _, cnf := range syncs {
+		conditionRSSTaskFinished := &TaskFinished{}
+		conditionJSONTaskFinished := &TaskFinished{}
+		conditionJIRATaskFinished := &TaskFinished{}
+		services := []core.Service{
+			{
+				As:      "http",
+				Name:    "http",
+				Version: "0.0.1",
+			},
+			{
+				Name:    "trello",
+				Version: "0.10.0",
+				As:      "trello",
+			},
+			{
+				Name:    "jira",
+				Version: "0.1.0",
+				As:      "jira",
+			},
+		}
+		pipe := core.Pipeline{
+			Metadata: core.PipelineMetadata{
+				Name: "sync",
+			},
+			Spec: core.PipelineSpec{
+				Services: services,
+				Reactions: []core.EventReaction{
+					{
+						Condition: core.ConditionEngineStarted(),
+						Reaction: func(ev state.Event, state state.State) []task.Task {
+							tasks := []task.Task{}
+							for _, binding := range cnf.Bindings {
+								src, err := getSource(binding.Source, cnf.Sources)
+								if err != nil {
+									dieOnError(fmt.Errorf("Source \"%s\" not found", binding.Source))
 								}
-								u, err := buildURL(src.RSS.URL, username, password)
-								dieOnError(err)
-								conditionRSSTaskFinished.AddTask(name)
-								tasks = append(tasks, buildHTTPTask(name, u))
-								continue
-							}
+								name := buildTaskName(binding)
 
-							if src.JSON != nil {
-								u, err := buildURL(src.JSON.URL, "", "")
-								dieOnError(err)
-								conditionJSONTaskFinished.AddTask(name)
-								tasks = append(tasks, buildHTTPTask(name, u))
-								continue
-							}
+								if src.RSS != nil {
+									username, password := "", ""
+									if src.RSS.Auth != nil {
+										username = src.RSS.Auth.Username
+										password = src.RSS.Auth.Password
+									}
+									u, err := buildURL(src.RSS.URL, username, password)
+									dieOnError(err)
+									conditionRSSTaskFinished.AddTask(name)
+									tasks = append(tasks, buildHTTPTask(name, u))
+									continue
+								}
 
-							if src.JIRA != nil {
-								u, err := buildURL(src.JIRA.Endpoint, "", "")
-								dieOnError(err)
-								conditionJIRATaskFinished.AddTask(name)
-								tasks = append(tasks, createJiraTask(createJiraTaskOptions{
-									endpoint: u,
-									jql:      templateString(&src.JIRA.JQL, nil),
-									taskName: name,
-									token:    templateString(&src.JIRA.Token, nil),
-									user:     templateString(&src.JIRA.User, nil),
-								}))
-								continue
+								if src.JSON != nil {
+									u, err := buildURL(src.JSON.URL, "", "")
+									dieOnError(err)
+									conditionJSONTaskFinished.AddTask(name)
+									tasks = append(tasks, buildHTTPTask(name, u))
+									continue
+								}
+
+								if src.JIRA != nil {
+									u, err := buildURL(src.JIRA.Endpoint, "", "")
+									dieOnError(err)
+									conditionJIRATaskFinished.AddTask(name)
+									tasks = append(tasks, createJiraTask(createJiraTaskOptions{
+										endpoint: u,
+										jql:      templateString(&src.JIRA.JQL, nil),
+										taskName: name,
+										token:    templateString(&src.JIRA.Token, nil),
+										user:     templateString(&src.JIRA.User, nil),
+									}))
+									continue
+								}
 							}
-						}
-						return tasks
+							return tasks
+						},
+					},
+					{
+						Condition: conditionRSSTaskFinished,
+						Reaction:  reactToRSSCompletedTask(cnf),
+					},
+					{
+						Condition: conditionJSONTaskFinished,
+						Reaction:  reactToJSONCompletedTask(cnf),
+					},
+					{
+						Condition: conditionJIRATaskFinished,
+						Reaction:  reactToJIRACompletedTask(cnf),
 					},
 				},
-				{
-					Condition: conditionRSSTaskFinished,
-					Reaction:  reactToRSSCompletedTask(cnf),
-				},
-				{
-					Condition: conditionJSONTaskFinished,
-					Reaction:  reactToJSONCompletedTask(cnf),
-				},
-				{
-					Condition: conditionJIRATaskFinished,
-					Reaction:  reactToJIRACompletedTask(cnf),
-				},
 			},
-		},
+		}
+		e := core.NewEngine(&core.EngineOptions{
+			Pipeline: pipe,
+		})
+		core.HandleEngineError(e.Run())
 	}
-	e := core.NewEngine(&core.EngineOptions{
-		Pipeline: pipe,
-	})
-	core.HandleEngineError(e.Run())
+
 }
 
 func buildHTTPTask(name string, url string) task.Task {
@@ -366,4 +364,30 @@ func populateTaskCandidate(bindingname string, tc *taskCandidate, cnf Sync) erro
 
 	tc.target = target
 	return nil
+}
+
+func readSyncFiles() []Sync {
+	result := []Sync{}
+	feed := os.Getenv("FEED")
+	if feed != "" {
+		cnf, err := readFile(feed)
+		dieOnError(err)
+		result = append(result, cnf)
+	}
+
+	config := os.Getenv("SYNCCONFIG")
+	if config != "" {
+		files := strings.Split(config, ";")
+		for _, f := range files {
+			cnf, err := readFile(f)
+			dieOnError(err)
+			result = append(result, cnf)
+		}
+	}
+
+	if len(result) == 0 {
+		dieOnError(fmt.Errorf("File not provided"))
+	}
+
+	return result
 }
