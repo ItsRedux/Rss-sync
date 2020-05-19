@@ -52,7 +52,6 @@ func buildURL(URL string, username string, password string) (string, error) {
 
 func filter(data interface{}, filter string) bool {
 	out := templateString(&filter, data)
-	fmt.Println(out)
 	return out == "true"
 }
 
