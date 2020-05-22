@@ -10,6 +10,7 @@ require (
 	github.com/boltdb/bolt v1.3.1 // indirect
 	github.com/docker/libkv v0.2.1 // indirect
 	github.com/dustin/gojson v0.0.0-20160307161227-2e71ec9dd5ad // indirect
+	github.com/go-jira/jira v1.0.23 // indirect
 	github.com/gosimple/slug v1.9.0 // indirect
 	github.com/gotestyourself/gotestyourself v2.2.0+incompatible // indirect
 	github.com/hairyhenderson/gomplate v3.5.0+incompatible
