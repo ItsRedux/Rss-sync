@@ -1,4 +1,4 @@
-package main
+package cmd
 
 // Copyright © 2020 oleg2807@gmail.com
 //
@@ -14,8 +14,25 @@ package main
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import "github.com/olegsu/rss-sync/cmd"
+import (
+	"github.com/spf13/cobra"
+)
 
-func main() {
-	cmd.Execute()
+var rootCmdOptions struct {
+	Verbose bool
+}
+
+var rootCmd = &cobra.Command{
+	Use:  "sync",
+	Long: "Sync data from sources to targets",
+}
+
+// Execute - execute the root command
+func Execute() {
+	err := rootCmd.Execute()
+	dieOnError(err)
+}
+
+func init() {
+	rootCmd.PersistentFlags().BoolVar(&rootCmdOptions.Verbose, "verbose", false, "Set to get more detailed output")
 }

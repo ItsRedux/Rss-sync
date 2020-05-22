@@ -1,17 +1,29 @@
-package main
+package cmd
+
+// Copyright © 2020 oleg2807@gmail.com
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
-	"text/template"
 
-	"github.com/hairyhenderson/gomplate"
 	"github.com/mmcdole/gofeed"
+	"github.com/olegsu/rss-sync/pkg/template"
 	"github.com/open-integration/service-catalog/jira/pkg/endpoints/list"
 	"gopkg.in/yaml.v2"
 )
@@ -40,39 +52,19 @@ func dieOnError(err error) {
 }
 
 func buildURL(URL string, username string, password string) (string, error) {
-	u, err := url.Parse(templateString(&URL, nil))
+	u, err := url.Parse(template.String(&URL, nil))
 	if err != nil {
 		return "", err
 	}
 	if username != "" && password != "" {
-		u.User = url.UserPassword(templateString(&username, nil), templateString(&password, nil))
+		u.User = url.UserPassword(template.String(&username, nil), template.String(&password, nil))
 	}
 	return u.String(), nil
 }
 
 func filter(data interface{}, filter string) bool {
-	out := templateString(&filter, data)
+	out := template.String(&filter, data)
 	return out == "true"
-}
-
-func templateString(tmpl *string, data interface{}) string {
-	if tmpl == nil {
-		fmt.Println("nil input")
-		return ""
-	}
-	out := new(bytes.Buffer)
-	funcs := gomplate.Funcs(nil)
-	template.Must(template.New(*tmpl).Funcs(funcs).Parse(*tmpl)).Execute(out, data)
-	return out.String()
-}
-
-func templateStringArray(tmpls []string) []string {
-	res := []string{}
-	for _, tmpl := range tmpls {
-		res = append(res, templateString(&tmpl, nil))
-	}
-
-	return res
 }
 
 func buildTaskName(binding Binding) string {

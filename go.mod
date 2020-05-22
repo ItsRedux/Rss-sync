@@ -18,10 +18,11 @@ require (
 	github.com/hashicorp/vault/api v1.0.4 // indirect
 	github.com/mmcdole/gofeed v1.0.0-beta2
 	github.com/mmcdole/goxpp v0.0.0-20181012175147-0068e33feabf // indirect
-	github.com/open-integration/core v0.58.0
+	github.com/open-integration/core v0.59.0
 	github.com/open-integration/service-catalog/http v0.0.1
-	github.com/open-integration/service-catalog/jira v0.2.0 // indirect
+	github.com/open-integration/service-catalog/jira v0.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
+	github.com/spf13/cobra v0.0.5
 	github.com/zealic/xignore v0.3.3 // indirect
 	gopkg.in/hairyhenderson/yaml.v2 v2.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/yaml.v2 v2.2.8

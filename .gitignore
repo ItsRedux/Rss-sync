@@ -4,3 +4,4 @@ logs
 events.yaml
 graph.dot
 state.yaml
+rss-sync
