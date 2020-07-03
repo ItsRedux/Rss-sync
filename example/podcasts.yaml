@@ -38,8 +38,9 @@ targets:
         title: '[{{ .source.name }}] Listen to: {{ .item.title }}'
         description: "{{ .feed.title }}\nLink: {{ .item.link }}"
         labels:
-          - 5cdafec7c65fab3704aaf9bc
-          - 5cdafe82e540515e358d86e1
+          - 5cdafec7c65fab3704aaf9bc # general
+          - 5cdafe82e540515e358d86e1 # podcasts
+          - 5cdab1c291d0c2ddc5905aa3 # effectivness
 
 filters:
   - &just-released-RFC1123 '{{ ((time.Now).Add (time.Hour -24)).Before (time.Parse "Mon, 02 Jan 2006 15:04:05 MST" .item.published) }}'

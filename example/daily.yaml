@@ -14,7 +14,8 @@ targets:
         title: 'Reccurent task: "{{ .content.name }}"'
         description: '...'
         labels:
-          - 5cdafec7c65fab3704aaf9bc
+          - 5cdafec7c65fab3704aaf9bc # codefresh
+          - "5cdafe92e62c1855c4ce9ae2" # distruction
 
 sources:
 - name: Recuurent Tasks
