@@ -21,7 +21,8 @@ trello: &trello
       {{end}}
       {{ end }}
     labels:
-      - 5cdafe92e62c1855c4ce9ae2
+          - "5cdafec7c65fab3704aaf9bc" # distruction
+          - "5cdafe92e62c1855c4ce9ae2" # codefresh
 
 targets:
   - name: Mentioned
