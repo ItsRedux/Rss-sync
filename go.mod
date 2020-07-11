@@ -3,7 +3,6 @@ module github.com/olegsu/rss-sync
 go 1.14
 
 require (
-	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/Shopify/ejson v1.2.1 // indirect
 	github.com/aws/aws-sdk-go v1.30.19 // indirect
@@ -19,7 +18,8 @@ require (
 	github.com/hashicorp/vault/api v1.0.4 // indirect
 	github.com/mmcdole/gofeed v1.0.0-beta2
 	github.com/mmcdole/goxpp v0.0.0-20181012175147-0068e33feabf // indirect
-	github.com/open-integration/core v0.59.0
+	github.com/open-integration/core v0.62.0
+	github.com/open-integration/service-catalog/google-calendar v0.0.1
 	github.com/open-integration/service-catalog/http v0.0.1
 	github.com/open-integration/service-catalog/jira v0.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect

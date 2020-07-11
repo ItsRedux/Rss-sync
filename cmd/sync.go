@@ -47,6 +47,12 @@ type (
 			Endpoint string `json:"endpoint" yaml:"endpoint"`
 			JQL      string `json:"jql" yaml:"jql"`
 		} `json:"jira,omitempty" yaml:"jira,omitempty"`
+		GoogleCalendar *struct {
+			ServiceAccount string `json:"service-account" yaml:"service-account"`
+			CalendarID     string `json:"calendar-id" yaml:"calendar-id"`
+			TimeMin        string `json:"time-min" yaml:"time-min"`
+			TimeMax        string `json:"time-max" yaml:"time-max"`
+		} `json:"google-calendar" yaml:"google-calendar"`
 		Filter map[string]string `json:"filter" yaml:"filter"`
 	}
 

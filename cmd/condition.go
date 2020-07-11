@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/open-integration/core/pkg/event"
 	"github.com/open-integration/core/pkg/state"
 )
 
@@ -10,7 +11,7 @@ type (
 	}
 )
 
-func (c *TaskFinished) Met(ev state.Event, s state.State) bool {
+func (c *TaskFinished) Met(ev event.Event, s state.State) bool {
 	met := false
 	for _, t := range c.followTasks {
 		if t == ev.Metadata.Task {

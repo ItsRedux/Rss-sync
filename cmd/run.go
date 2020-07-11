@@ -17,13 +17,16 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/mmcdole/gofeed"
 	"github.com/olegsu/rss-sync/pkg/template"
 	"github.com/olegsu/rss-sync/pkg/values"
 	"github.com/open-integration/core"
+	"github.com/open-integration/core/pkg/event"
 	"github.com/open-integration/core/pkg/state"
 	"github.com/open-integration/core/pkg/task"
+	"github.com/open-integration/service-catalog/google-calendar/pkg/endpoints/getEvents"
 	"github.com/open-integration/service-catalog/http/pkg/endpoints/call"
 	"github.com/open-integration/service-catalog/jira/pkg/endpoints/list"
 	"github.com/spf13/cobra"
@@ -49,11 +52,30 @@ type (
 		user     string
 		jql      string
 	}
+
+	createGoogleCalendarTaskOptions struct {
+		taskName                string
+		ServiceAccount          getEvents.ServiceAccount
+		CalendarID              string
+		ICalUID                 *string
+		MaxAttendees            *int64
+		MaxResults              *int64
+		OrderBy                 *string
+		PrivateExtendedProperty *string
+		Q                       *string
+		SharedExtendedProperty  *string
+		ShowDeleted             bool
+		ShowHiddenInvitations   *bool
+		SingleEvents            *bool
+		TimeMax                 string
+		TimeMin                 string
+		TimeZone                *string
+		UpdatedMin              *string
+	}
 )
 
 const (
-	rootContext       = "Values"
-	defaultOutputFile = "iris-generated.yaml"
+	rootContext = "Values"
 )
 
 var runCmd = &cobra.Command{
@@ -65,6 +87,7 @@ var runCmd = &cobra.Command{
 			conditionRSSTaskFinished := &TaskFinished{}
 			conditionJSONTaskFinished := &TaskFinished{}
 			conditionJIRATaskFinished := &TaskFinished{}
+			conditionGoogleCalendarTaskFinished := &TaskFinished{}
 			services := []core.Service{
 				{
 					As:      "http",
@@ -81,6 +104,11 @@ var runCmd = &cobra.Command{
 					Version: "0.1.0",
 					As:      "jira",
 				},
+				{
+					Name:    "google-calendar",
+					Version: "0.0.3",
+					As:      "google-calendar",
+				},
 			}
 			pipe := core.Pipeline{
 				Metadata: core.PipelineMetadata{
@@ -91,7 +119,7 @@ var runCmd = &cobra.Command{
 					Reactions: []core.EventReaction{
 						{
 							Condition: core.ConditionEngineStarted(),
-							Reaction: func(ev state.Event, state state.State) []task.Task {
+							Reaction: func(ev event.Event, state state.State) []task.Task {
 								tasks := []task.Task{}
 								for _, binding := range cnf.Bindings {
 									src, err := getSource(binding.Source, cnf.Sources)
@@ -134,6 +162,24 @@ var runCmd = &cobra.Command{
 										}))
 										continue
 									}
+
+									if src.GoogleCalendar != nil {
+										conditionGoogleCalendarTaskFinished.AddTask(name)
+										f, err := ioutil.ReadFile(template.String(&src.GoogleCalendar.ServiceAccount, nil))
+										dieOnError(err)
+										sa := getEvents.ServiceAccount{}
+										err = json.Unmarshal(f, &sa)
+										dieOnError(err)
+										tasks = append(tasks, createGoogleCalerndarTask(createGoogleCalendarTaskOptions{
+											taskName:       name,
+											ServiceAccount: sa,
+											CalendarID:     template.String(&src.GoogleCalendar.CalendarID, nil),
+											TimeMin:        template.String(&src.GoogleCalendar.TimeMin, nil),
+											TimeMax:        template.String(&src.GoogleCalendar.TimeMax, nil),
+											ShowDeleted:    true,
+										}))
+										continue
+									}
 								}
 								return tasks
 							},
@@ -149,6 +195,10 @@ var runCmd = &cobra.Command{
 						{
 							Condition: conditionJIRATaskFinished,
 							Reaction:  reactToJIRACompletedTask(cnf),
+						},
+						{
+							Condition: conditionGoogleCalendarTaskFinished,
+							Reaction:  reactToGoogleCalendarCompletedTask(cnf),
 						},
 					},
 				},
@@ -188,8 +238,8 @@ func buildHTTPTask(name string, url string) task.Task {
 	}
 }
 
-func reactToRSSCompletedTask(cnf Sync) func(ev state.Event, state state.State) []task.Task {
-	return func(ev state.Event, state state.State) []task.Task {
+func reactToRSSCompletedTask(cnf Sync) func(ev event.Event, state state.State) []task.Task {
+	return func(ev event.Event, state state.State) []task.Task {
 		tasks := []task.Task{}
 		res := &call.CallReturns{}
 		err := json.Unmarshal([]byte(state.Tasks()[ev.Metadata.Task].Output), res)
@@ -220,8 +270,8 @@ func reactToRSSCompletedTask(cnf Sync) func(ev state.Event, state state.State) [
 	}
 }
 
-func reactToJSONCompletedTask(cnf Sync) func(ev state.Event, state state.State) []task.Task {
-	return func(ev state.Event, state state.State) []task.Task {
+func reactToJSONCompletedTask(cnf Sync) func(ev event.Event, state state.State) []task.Task {
+	return func(ev event.Event, state state.State) []task.Task {
 		tasks := []task.Task{}
 		res := &call.CallReturns{}
 		err := json.Unmarshal([]byte(state.Tasks()[ev.Metadata.Task].Output), res)
@@ -256,8 +306,8 @@ func reactToJSONCompletedTask(cnf Sync) func(ev state.Event, state state.State) 
 	}
 }
 
-func reactToJIRACompletedTask(cnf Sync) func(ev state.Event, state state.State) []task.Task {
-	return func(ev state.Event, state state.State) []task.Task {
+func reactToJIRACompletedTask(cnf Sync) func(ev event.Event, state state.State) []task.Task {
+	return func(ev event.Event, state state.State) []task.Task {
 		tasks := []task.Task{}
 		res := &list.ListReturns{}
 		err := json.Unmarshal([]byte(state.Tasks()[ev.Metadata.Task].Output), res)
@@ -272,6 +322,31 @@ func reactToJIRACompletedTask(cnf Sync) func(ev state.Event, state state.State) 
 		root := buildValues(taskCandidate)
 		for i, issue := range res.Issues {
 			root.Add("issue", jiraIssueToJSON(issue))
+			if !filterSource(taskCandidate, root) {
+				return nil
+			}
+			tasks = append(tasks, createTrelloTask(fmt.Sprintf("%d-created-card-%s", i, name), taskCandidate, root))
+		}
+		return tasks
+	}
+}
+
+func reactToGoogleCalendarCompletedTask(cnf Sync) func(ev event.Event, state state.State) []task.Task {
+	return func(ev event.Event, state state.State) []task.Task {
+		tasks := []task.Task{}
+		res := &getEvents.GetEventsReturns{}
+		err := json.Unmarshal([]byte(state.Tasks()[ev.Metadata.Task].Output), res)
+		dieOnError(err)
+
+		taskCandidate := taskCandidate{}
+
+		name := getBindingNameFromTaskName(ev.Metadata.Task)
+
+		populateTaskCandidate(name, &taskCandidate, cnf)
+
+		root := buildValues(taskCandidate)
+		for i, event := range res.Events {
+			root.Add("event", googleCalendarEventToJSON(event))
 			if !filterSource(taskCandidate, root) {
 				return nil
 			}
@@ -353,6 +428,114 @@ func createJiraTask(options createJiraTaskOptions) task.Task {
 					Value: "*all",
 				},
 			},
+		},
+	}
+}
+
+func createGoogleCalerndarTask(options createGoogleCalendarTaskOptions) task.Task {
+	arguments := []task.Argument{
+		{
+			Key:   "ServiceAccount",
+			Value: options.ServiceAccount,
+		},
+		{
+			Key:   "CalendarID",
+			Value: options.CalendarID,
+		},
+		{
+			Key:   "ShowDeleted",
+			Value: options.ShowDeleted,
+		},
+	}
+
+	if options.ICalUID != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "ICalUID",
+			Value: *options.ICalUID,
+		})
+	}
+
+	if options.MaxAttendees != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "MaxAttendees",
+			Value: *options.MaxAttendees,
+		})
+	}
+	if options.MaxResults != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "MaxResults",
+			Value: *options.MaxResults,
+		})
+	}
+	if options.OrderBy != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "OrderBy",
+			Value: *options.OrderBy,
+		})
+	}
+	if options.PrivateExtendedProperty != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "PrivateExtendedProperty",
+			Value: *options.PrivateExtendedProperty,
+		})
+	}
+	if options.Q != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "Q",
+			Value: *options.Q,
+		})
+	}
+	if options.SharedExtendedProperty != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "SharedExtendedProperty",
+			Value: *options.SharedExtendedProperty,
+		})
+	}
+	if options.ShowHiddenInvitations != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "ShowHiddenInvitations",
+			Value: *options.ShowHiddenInvitations,
+		})
+	}
+	if options.SingleEvents != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "SingleEvents",
+			Value: *options.SingleEvents,
+		})
+	}
+	if options.TimeMax != "" {
+		arguments = append(arguments, task.Argument{
+			Key:   "TimeMax",
+			Value: options.TimeMax,
+		})
+	}
+	if options.TimeMin != "" {
+		arguments = append(arguments, task.Argument{
+			Key:   "TimeMin",
+			Value: options.TimeMin,
+		})
+	}
+	if options.TimeZone != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "TimeZone",
+			Value: *options.TimeZone,
+		})
+	}
+	if options.UpdatedMin != nil {
+		arguments = append(arguments, task.Argument{
+			Key:   "UpdatedMin",
+			Value: *options.UpdatedMin,
+		})
+	}
+
+	return task.Task{
+		Metadata: task.Metadata{
+			Name: options.taskName,
+		},
+		Spec: task.Spec{
+			Service:   "google-calendar",
+			Endpoint:  "getEvents",
+			Arguments: arguments,
 		},
 	}
 }

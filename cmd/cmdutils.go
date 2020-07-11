@@ -24,6 +24,7 @@ import (
 
 	"github.com/mmcdole/gofeed"
 	"github.com/olegsu/rss-sync/pkg/template"
+	"github.com/open-integration/service-catalog/google-calendar/pkg/endpoints/getEvents"
 	"github.com/open-integration/service-catalog/jira/pkg/endpoints/list"
 	"gopkg.in/yaml.v2"
 )
@@ -85,6 +86,14 @@ func gofeedItemToJSON(item gofeed.Item) map[string]interface{} {
 
 func jiraIssueToJSON(issue list.Issue) map[string]interface{} {
 	b, err := json.Marshal(issue)
+	if err != nil {
+		return nil
+	}
+	return toJSON(b)
+}
+
+func googleCalendarEventToJSON(ev getEvents.Event) map[string]interface{} {
+	b, err := json.Marshal(ev)
 	if err != nil {
 		return nil
 	}
