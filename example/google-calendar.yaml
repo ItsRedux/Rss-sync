@@ -1,0 +1,90 @@
+trello: &trello
+  token: '{{ env.Getenv "TRELLO_TOKEN" }}'
+  key: '{{ env.Getenv "TRELLO_KEY" }}'
+  board-id: '{{ env.Getenv "TRELLO_BOARD_ID" }}'
+  list-id: '{{ env.Getenv "TRELLO_LIST_ID" }}'
+  card:
+    title: 'Calendar: "{{ .event.summary }}"'
+    description: |
+      {{ if .event.htmlLink }}
+      Link: {{ .event.htmlLink }}
+      {{ end }}
+      {{ if .event.hangoutLink }}
+      Dail: {{ .event.hangoutLink }}
+      {{ end }}
+      {{ if .event.description }}
+      Description:
+      {{ .event.description | strings.Trunc 5000  }}
+      {{ end }}
+      {{ .event }}
+
+calendar: &calendar
+    service-account: '{{ env.Getenv "GOOGLE_SERVICE_ACCOUNT_PATH" }}'
+    calendar-id: '{{ env.Getenv "GOOGLE_CALENDAR_ID" }}'
+    time-min: '{{ StartDay time.RFC3339 }}'
+    time-max: '{{ EndDay time.RFC3339 }}'
+
+targets:
+  - name: Personal-Necessity
+    trello:
+      <<: *trello
+      card:
+        labels:
+          - 5cdafec7c65fab3704aaf9bc # general
+          - 5cdab1c291d0c2ddc5905aa4 # necessity
+  - name: Personal-Effectivness
+    trello:
+      <<: *trello
+      card:
+        labels:
+          - 5cdafec7c65fab3704aaf9bc # general
+          - 5cdab1c291d0c2ddc5905aa3 # effectivness
+  - name: Personal-Distruction
+    trello:
+      <<: *trello
+      card:
+        labels:
+          - 5cdafec7c65fab3704aaf9bc # general
+          - 5cdab1c291d0c2ddc5905aa5 # distruction
+  - name: Business
+    trello:
+      <<: *trello
+      card:
+        labels:
+          - 5cdab1c291d0c2ddc5905aa5 # distruction
+          - 5cdafe92e62c1855c4ce9ae2 # codefresh
+
+sources:
+- name: Personal-Necessity
+  google-calendar:
+    <<: *calendar
+    calendar-id: '{{ env.Getenv "GOOGLE_NECESSITY_CALENDAR_ID" }}'
+- name: Personal-Effectivness
+  google-calendar:
+    <<: *calendar
+    calendar-id: '{{ env.Getenv "GOOGLE_EFFECTIVNESS_CALENDAR_ID" }}'
+- name: Personal-Distruction
+  google-calendar:
+    <<: *calendar
+    calendar-id: '{{ env.Getenv "GOOGLE_DISTRUCTION_CALENDAR_ID" }}'
+- name: Business
+  google-calendar:
+    <<: *calendar
+    calendar-id: '{{ env.Getenv "GOOGLE_BUSINESS_CALENDAR_ID" }}'
+  filter:
+    skip-cancelled: '{{ ne .event.status "cancelled" }}'
+
+
+bindings:
+- name: Personal-Necessity
+  source: Personal-Necessity
+  target: Personal-Necessity
+- name: Personal-Effectivness
+  source: Personal-Effectivness
+  target: Personal-Effectivness
+- name: Personal-Distruction
+  source: Personal-Distruction
+  target: Personal-Distruction
+- name: Business
+  source: Business
+  target: Business
