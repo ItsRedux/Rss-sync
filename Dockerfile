@@ -13,6 +13,6 @@ RUN go build -o rss-sync .
 
 FROM alpine:3.11
 
-RUN apk update && apk add --no-cache ca-certificates && apk upgrade
+RUN apk update && apk add --no-cache ca-certificates curl && apk upgrade
 
 COPY --from=godev ./rss-sync/rss-sync /rss-sync
