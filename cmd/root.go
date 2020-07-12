@@ -30,7 +30,7 @@ var rootCmd = &cobra.Command{
 // Execute - execute the root command
 func Execute() {
 	err := rootCmd.Execute()
-	dieOnError(err)
+	dieOnError("", err)
 }
 
 func init() {

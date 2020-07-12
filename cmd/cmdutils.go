@@ -45,9 +45,9 @@ func readFile(location string) (Sync, error) {
 	return cnf, nil
 }
 
-func dieOnError(err error) {
+func dieOnError(msg string, err error) {
 	if err != nil {
-		fmt.Printf("[Error] %s\n", err.Error())
+		fmt.Printf("[ERROR] %s: %v", msg, err)
 		os.Exit(1)
 	}
 }

@@ -126,7 +126,7 @@ var runCmd = &cobra.Command{
 								for _, binding := range cnf.Bindings {
 									src, err := getSource(binding.Source, cnf.Sources)
 									if err != nil {
-										dieOnError(fmt.Errorf("Source \"%s\" not found", binding.Source))
+										dieOnError("", fmt.Errorf("Source \"%s\" not found", binding.Source))
 									}
 									name := buildTaskName(binding)
 
@@ -137,7 +137,7 @@ var runCmd = &cobra.Command{
 											password = src.RSS.Auth.Password
 										}
 										u, err := buildURL(src.RSS.URL, username, password)
-										dieOnError(err)
+										dieOnError(fmt.Sprintf("Failed to build URL from %s", src.RSS.URL), err)
 										conditionRSSTaskFinished.AddTask(name)
 										tasks = append(tasks, buildHTTPTask(name, u))
 										continue
@@ -145,7 +145,7 @@ var runCmd = &cobra.Command{
 
 									if src.JSON != nil {
 										u, err := buildURL(src.JSON.URL, "", "")
-										dieOnError(err)
+										dieOnError(fmt.Sprintf("Failed to build URL from %s", src.JSON.URL), err)
 										conditionJSONTaskFinished.AddTask(name)
 										tasks = append(tasks, buildHTTPTask(name, u))
 										continue
@@ -153,7 +153,7 @@ var runCmd = &cobra.Command{
 
 									if src.JIRA != nil {
 										u, err := buildURL(src.JIRA.Endpoint, "", "")
-										dieOnError(err)
+										dieOnError(fmt.Sprintf("Failed to build URL from %s", src.JIRA.Endpoint), err)
 										conditionJIRATaskFinished.AddTask(name)
 										tasks = append(tasks, createJiraTask(createJiraTaskOptions{
 											endpoint: u,
@@ -168,10 +168,10 @@ var runCmd = &cobra.Command{
 									if src.GoogleCalendar != nil {
 										conditionGoogleCalendarTaskFinished.AddTask(name)
 										f, err := ioutil.ReadFile(template.String(&src.GoogleCalendar.ServiceAccount, nil))
-										dieOnError(err)
+										dieOnError("Faild to read service-account file", err)
 										sa := getEvents.ServiceAccount{}
 										err = json.Unmarshal(f, &sa)
-										dieOnError(err)
+										dieOnError("", err)
 										tasks = append(tasks, createGoogleCalerndarTask(createGoogleCalendarTaskOptions{
 											taskName:       name,
 											ServiceAccount: sa,
@@ -246,10 +246,10 @@ func reactToRSSCompletedTask(cnf Sync) func(ev event.Event, state state.State) [
 		tasks := []task.Task{}
 		res := &call.CallReturns{}
 		err := json.Unmarshal([]byte(state.Tasks()[ev.Metadata.Task].Output), res)
-		dieOnError(err)
+		dieOnError("", err)
 		fp := gofeed.NewParser()
 		feed, err := fp.ParseString(res.Body)
-		dieOnError(err)
+		dieOnError("", err)
 		taskCandidate := taskCandidate{}
 		items := []gofeed.Item{}
 		for _, item := range feed.Items {
@@ -278,7 +278,7 @@ func reactToJSONCompletedTask(cnf Sync) func(ev event.Event, state state.State) 
 		tasks := []task.Task{}
 		res := &call.CallReturns{}
 		err := json.Unmarshal([]byte(state.Tasks()[ev.Metadata.Task].Output), res)
-		dieOnError(err)
+		dieOnError("", err)
 
 		taskCandidate := taskCandidate{}
 
@@ -314,7 +314,7 @@ func reactToJIRACompletedTask(cnf Sync) func(ev event.Event, state state.State) 
 		tasks := []task.Task{}
 		res := &list.ListReturns{}
 		err := json.Unmarshal([]byte(state.Tasks()[ev.Metadata.Task].Output), res)
-		dieOnError(err)
+		dieOnError("", err)
 
 		taskCandidate := taskCandidate{}
 
@@ -339,7 +339,7 @@ func reactToGoogleCalendarCompletedTask(cnf Sync) func(ev event.Event, state sta
 		tasks := []task.Task{}
 		res := &getEvents.GetEventsReturns{}
 		err := json.Unmarshal([]byte(state.Tasks()[ev.Metadata.Task].Output), res)
-		dieOnError(err)
+		dieOnError("", err)
 
 		taskCandidate := taskCandidate{}
 
@@ -588,12 +588,12 @@ func readSyncFiles(files []string) map[string]Sync {
 	result := map[string]Sync{}
 	for _, f := range files {
 		cnf, err := readFile(f)
-		dieOnError(err)
+		dieOnError("", err)
 		result[path.Base(f)] = cnf
 	}
 
 	if len(result) == 0 {
-		dieOnError(fmt.Errorf("File not provided"))
+		dieOnError("", fmt.Errorf("File not provided"))
 	}
 
 	return result
