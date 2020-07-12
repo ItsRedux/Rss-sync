@@ -85,7 +85,7 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		syncs := readSyncFiles(runCmdOptions.files)
 		for name, cnf := range syncs {
-			fmt.Printf("Startin to run sync from file %s\n", name)
+			fmt.Printf("Starting to run sync from file %s\n", name)
 			conditionRSSTaskFinished := &TaskFinished{}
 			conditionJSONTaskFinished := &TaskFinished{}
 			conditionJIRATaskFinished := &TaskFinished{}
