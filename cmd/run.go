@@ -67,7 +67,7 @@ type (
 		SharedExtendedProperty  *string
 		ShowDeleted             bool
 		ShowHiddenInvitations   *bool
-		SingleEvents            *bool
+		SingleEvents            bool
 		TimeMax                 string
 		TimeMin                 string
 		TimeZone                *string
@@ -179,6 +179,7 @@ var runCmd = &cobra.Command{
 											TimeMin:        template.String(&src.GoogleCalendar.TimeMin, nil),
 											TimeMax:        template.String(&src.GoogleCalendar.TimeMax, nil),
 											ShowDeleted:    true,
+											SingleEvents:   true,
 										}))
 										continue
 									}
@@ -325,7 +326,7 @@ func reactToJIRACompletedTask(cnf Sync) func(ev event.Event, state state.State) 
 		for i, issue := range res.Issues {
 			root.Add("issue", jiraIssueToJSON(issue))
 			if !filterSource(taskCandidate, root) {
-				return nil
+				continue
 			}
 			tasks = append(tasks, createTrelloTask(fmt.Sprintf("%d-created-card-%s", i, name), taskCandidate, root))
 		}
@@ -350,7 +351,7 @@ func reactToGoogleCalendarCompletedTask(cnf Sync) func(ev event.Event, state sta
 		for i, event := range res.Events {
 			root.Add("event", googleCalendarEventToJSON(event))
 			if !filterSource(taskCandidate, root) {
-				return nil
+				continue
 			}
 			tasks = append(tasks, createTrelloTask(fmt.Sprintf("%d-created-card-%s", i, name), taskCandidate, root))
 		}
@@ -448,6 +449,10 @@ func createGoogleCalerndarTask(options createGoogleCalendarTaskOptions) task.Tas
 			Key:   "ShowDeleted",
 			Value: options.ShowDeleted,
 		},
+		{
+			Key:   "SingleEvents",
+			Value: options.SingleEvents,
+		},
 	}
 
 	if options.ICalUID != nil {
@@ -497,12 +502,6 @@ func createGoogleCalerndarTask(options createGoogleCalendarTaskOptions) task.Tas
 		arguments = append(arguments, task.Argument{
 			Key:   "ShowHiddenInvitations",
 			Value: *options.ShowHiddenInvitations,
-		})
-	}
-	if options.SingleEvents != nil {
-		arguments = append(arguments, task.Argument{
-			Key:   "SingleEvents",
-			Value: *options.SingleEvents,
 		})
 	}
 	if options.TimeMax != "" {

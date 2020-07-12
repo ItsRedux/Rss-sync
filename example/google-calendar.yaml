@@ -51,7 +51,7 @@ targets:
       <<: *trello
       card:
         labels:
-          - 5cdab1c291d0c2ddc5905aa5 # distruction
+          - 5cdab1c291d0c2ddc5905aa3 # effectivness
           - 5cdafe92e62c1855c4ce9ae2 # codefresh
 
 sources:
@@ -72,7 +72,7 @@ sources:
     <<: *calendar
     calendar-id: '{{ env.Getenv "GOOGLE_BUSINESS_CALENDAR_ID" }}'
   filter:
-    skip-cancelled: '{{ ne .event.status "cancelled" }}'
+    skip-cancelled: '{{ ne .event.status "confirmed" }}'
 
 
 bindings:
