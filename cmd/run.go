@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"path"
 
 	"github.com/mmcdole/gofeed"
 	"github.com/olegsu/rss-sync/pkg/template"
@@ -83,7 +84,8 @@ var runCmd = &cobra.Command{
 	Long: "Start to sync",
 	Run: func(cmd *cobra.Command, args []string) {
 		syncs := readSyncFiles(runCmdOptions.files)
-		for _, cnf := range syncs {
+		for name, cnf := range syncs {
+			fmt.Printf("Startin to run sync from file %s\n", name)
 			conditionRSSTaskFinished := &TaskFinished{}
 			conditionJSONTaskFinished := &TaskFinished{}
 			conditionJIRATaskFinished := &TaskFinished{}
@@ -583,12 +585,12 @@ func populateTaskCandidate(bindingname string, tc *taskCandidate, cnf Sync) erro
 	return nil
 }
 
-func readSyncFiles(files []string) []Sync {
-	result := []Sync{}
+func readSyncFiles(files []string) map[string]Sync {
+	result := map[string]Sync{}
 	for _, f := range files {
 		cnf, err := readFile(f)
 		dieOnError(err)
-		result = append(result, cnf)
+		result[path.Base(f)] = cnf
 	}
 
 	if len(result) == 0 {
