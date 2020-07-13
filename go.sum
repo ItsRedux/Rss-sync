@@ -338,6 +338,8 @@ github.com/open-integration/core v0.58.0 h1:FVdSZGXWnb8c54QdHrX40FadERMVPFTlhX2e
 github.com/open-integration/core v0.58.0/go.mod h1:UspgEVrhZnAV0FWJEGRRmg1u/UZhYW5gQeiRgYEu3Pc=
 github.com/open-integration/core v0.62.0 h1:ab02VkV1SKJs9gSpAMg7fq326baRYpaREe7vSkLhcn8=
 github.com/open-integration/core v0.62.0/go.mod h1:oVCNiAH8mJhWQIVgtzBPZHS5TluH8h0QobeyuKP7gX4=
+github.com/open-integration/core v0.64.0 h1:7K7ZILyKv8Grjz2GY21NpAz0k4jF4kl3Lp1GB0T4O8c=
+github.com/open-integration/core v0.64.0/go.mod h1:oVCNiAH8mJhWQIVgtzBPZHS5TluH8h0QobeyuKP7gX4=
 github.com/open-integration/service-catalog/google-calendar v0.0.1 h1:nl1j01ScRl2kMfy1iu7VPjU9ZPmcxuvuvtLa0yGH+8Q=
 github.com/open-integration/service-catalog/google-calendar v0.0.1/go.mod h1:MdZFsVPaEMAHNqTOFIBjLaxsJ9Eqih+0aivGxcAj3rA=
 github.com/open-integration/service-catalog/http v0.0.1 h1:C2qjcmCdUCYvN6lEBRiVEI5zf6c8lO5aONtDAdQlDr0=

@@ -220,25 +220,17 @@ func init() {
 }
 
 func buildHTTPTask(name string, url string) task.Task {
-	return task.Task{
-		Metadata: task.Metadata{
-			Name: name,
+	arguments := []task.Argument{
+		{
+			Key:   "URL",
+			Value: url,
 		},
-		Spec: task.Spec{
-			Service:  "http",
-			Endpoint: "call",
-			Arguments: []task.Argument{
-				{
-					Key:   "URL",
-					Value: url,
-				},
-				{
-					Key:   "Verb",
-					Value: "GET",
-				},
-			},
+		{
+			Key:   "Verb",
+			Value: "GET",
 		},
 	}
+	return core.NewSerivceTask(name, "http", "call", arguments...)
 }
 
 func reactToRSSCompletedTask(cnf Sync) func(ev event.Event, state state.State) []task.Task {
@@ -360,79 +352,63 @@ func reactToGoogleCalendarCompletedTask(cnf Sync) func(ev event.Event, state sta
 }
 
 func createTrelloTask(name string, taskCandidate taskCandidate, data interface{}) task.Task {
-	return task.Task{
-		Metadata: task.Metadata{
-			Name: name,
+	arguments := []task.Argument{
+		{
+			Key:   "App",
+			Value: template.String(&taskCandidate.target.Trello.Key, nil),
 		},
-		Spec: task.Spec{
-			Endpoint: "addcard",
-			Service:  "trello",
-			Arguments: []task.Argument{
-				{
-					Key:   "App",
-					Value: template.String(&taskCandidate.target.Trello.Key, nil),
-				},
-				{
-					Key:   "Token",
-					Value: template.String(&taskCandidate.target.Trello.Token, nil),
-				},
-				{
-					Key:   "Board",
-					Value: template.String(&taskCandidate.target.Trello.BoardID, nil),
-				},
-				{
-					Key:   "List",
-					Value: template.String(&taskCandidate.target.Trello.ListID, nil),
-				},
-				{
-					Key:   "Name",
-					Value: template.String(taskCandidate.target.Trello.Card.Title, data),
-				},
-				{
-					Key:   "Description",
-					Value: template.String(taskCandidate.target.Trello.Card.Description, data),
-				},
-				{
-					Key:   "Labels",
-					Value: template.StringArray(taskCandidate.target.Trello.Card.Labels),
-				},
-			},
+		{
+			Key:   "Token",
+			Value: template.String(&taskCandidate.target.Trello.Token, nil),
+		},
+		{
+			Key:   "Board",
+			Value: template.String(&taskCandidate.target.Trello.BoardID, nil),
+		},
+		{
+			Key:   "List",
+			Value: template.String(&taskCandidate.target.Trello.ListID, nil),
+		},
+		{
+			Key:   "Name",
+			Value: template.String(taskCandidate.target.Trello.Card.Title, data),
+		},
+		{
+			Key:   "Description",
+			Value: template.String(taskCandidate.target.Trello.Card.Description, data),
+		},
+		{
+			Key:   "Labels",
+			Value: template.StringArray(taskCandidate.target.Trello.Card.Labels),
 		},
 	}
+	return core.NewSerivceTask(name, "trello", "addcard", arguments...)
 }
 
 func createJiraTask(options createJiraTaskOptions) task.Task {
-	return task.Task{
-		Metadata: task.Metadata{
-			Name: options.taskName,
+	arguments := []task.Argument{
+		{
+			Key:   "API_Token",
+			Value: options.token,
 		},
-		Spec: task.Spec{
-			Service:  "jira",
-			Endpoint: "list",
-			Arguments: []task.Argument{
-				{
-					Key:   "API_Token",
-					Value: options.token,
-				},
-				{
-					Key:   "Endpoint",
-					Value: options.endpoint,
-				},
-				{
-					Key:   "User",
-					Value: options.user,
-				},
-				{
-					Key:   "JQL",
-					Value: options.jql,
-				},
-				{
-					Key:   "QueryFields",
-					Value: "*all",
-				},
-			},
+		{
+			Key:   "Endpoint",
+			Value: options.endpoint,
+		},
+		{
+			Key:   "User",
+			Value: options.user,
+		},
+		{
+			Key:   "JQL",
+			Value: options.jql,
+		},
+		{
+			Key:   "QueryFields",
+			Value: "*all",
 		},
 	}
+	return core.NewSerivceTask(options.taskName, "jira", "list", arguments...)
 }
 
 func createGoogleCalerndarTask(options createGoogleCalendarTaskOptions) task.Task {
@@ -528,17 +504,7 @@ func createGoogleCalerndarTask(options createGoogleCalendarTaskOptions) task.Tas
 			Value: *options.UpdatedMin,
 		})
 	}
-
-	return task.Task{
-		Metadata: task.Metadata{
-			Name: options.taskName,
-		},
-		Spec: task.Spec{
-			Service:   "google-calendar",
-			Endpoint:  "getEvents",
-			Arguments: arguments,
-		},
-	}
+	return core.NewSerivceTask(options.taskName, "google-calendar", "getEvents", arguments...)
 }
 
 func buildValues(taskCandidate taskCandidate) *values.Values {
