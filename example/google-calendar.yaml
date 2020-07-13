@@ -72,7 +72,7 @@ sources:
     <<: *calendar
     calendar-id: '{{ env.Getenv "GOOGLE_BUSINESS_CALENDAR_ID" }}'
   filter:
-    skip-cancelled: '{{ ne .event.status "confirmed" }}'
+    skip-cancelled: '{{ eq .event.status "confirmed" }}'
 
 
 bindings:
