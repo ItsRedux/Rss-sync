@@ -251,6 +251,8 @@ github.com/imdario/mergo v0.3.7/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJ
 github.com/imdario/mergo v0.3.8/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJh5FfA=
 github.com/imdario/mergo v0.3.9 h1:UauaLniWCFHWd+Jp9oCEkTBj8VO/9DKg3PV3VCNMDIg=
 github.com/imdario/mergo v0.3.9/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJh5FfA=
+github.com/imdario/mergo v0.3.10 h1:6q5mVkdH/vYmqngx7kZQTjJ5HRsx+ImorDIEQ+beJgc=
+github.com/imdario/mergo v0.3.10/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
 github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec h1:CGkYB1Q7DSsH/ku+to+foV4agt2F2miquaLUgF6L178=
 github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec/go.mod h1:cOaXtrgN4ScfRrD9Bre7U1thNq5RtJ8ZoP4iXVGRj6o=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
@@ -340,6 +342,8 @@ github.com/open-integration/core v0.62.0 h1:ab02VkV1SKJs9gSpAMg7fq326baRYpaREe7v
 github.com/open-integration/core v0.62.0/go.mod h1:oVCNiAH8mJhWQIVgtzBPZHS5TluH8h0QobeyuKP7gX4=
 github.com/open-integration/core v0.64.0 h1:7K7ZILyKv8Grjz2GY21NpAz0k4jF4kl3Lp1GB0T4O8c=
 github.com/open-integration/core v0.64.0/go.mod h1:oVCNiAH8mJhWQIVgtzBPZHS5TluH8h0QobeyuKP7gX4=
+github.com/open-integration/core v0.65.0 h1:0eBh8b/ON8flWhhu3rDLbqf6yOQVQp9ZsecB2BmKZMQ=
+github.com/open-integration/core v0.65.0/go.mod h1:sDwFltqzUW2FqgZVD3UOiu8vSG9zix0eLu0IhsotEoA=
 github.com/open-integration/service-catalog/google-calendar v0.0.1 h1:nl1j01ScRl2kMfy1iu7VPjU9ZPmcxuvuvtLa0yGH+8Q=
 github.com/open-integration/service-catalog/google-calendar v0.0.1/go.mod h1:MdZFsVPaEMAHNqTOFIBjLaxsJ9Eqih+0aivGxcAj3rA=
 github.com/open-integration/service-catalog/http v0.0.1 h1:C2qjcmCdUCYvN6lEBRiVEI5zf6c8lO5aONtDAdQlDr0=
@@ -682,6 +686,8 @@ gopkg.in/yaml.v2 v2.2.7 h1:VUgggvou5XRW9mHwD/yXxIYSMtY0zoKQf/v226p2nyo=
 gopkg.in/yaml.v2 v2.2.7/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.8 h1:obN1ZagJSUGI0Ek/LBmuj4SNLPfIny3KsKFopxRdj10=
 gopkg.in/yaml.v2 v2.2.8/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
+gopkg.in/yaml.v2 v2.3.0 h1:clyUAQHOM3G0M3f5vQj7LuJrETvjVot3Z5el9nffUtU=
+gopkg.in/yaml.v2 v2.3.0/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c h1:dUUwHk2QECo/6vqA44rthZ8ie2QXMNeKRTHCNY2nXvo=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gotest.tools v2.2.0+incompatible h1:VsBPFP1AI068pPrMxtb/S8Zkgf9xEmTLJjfM+P5UIEo=
