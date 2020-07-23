@@ -20,8 +20,8 @@ require (
 	github.com/mmcdole/goxpp v0.0.0-20181012175147-0068e33feabf // indirect
 	github.com/open-integration/core v0.65.0
 	github.com/open-integration/service-catalog/google-calendar v0.0.1
-	github.com/open-integration/service-catalog/http v0.0.1
-	github.com/open-integration/service-catalog/jira v0.2.0
+	github.com/open-integration/service-catalog/http v0.0.2
+	github.com/open-integration/service-catalog/jira v0.3.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/spf13/cobra v0.0.5
 	github.com/zealic/xignore v0.3.3 // indirect

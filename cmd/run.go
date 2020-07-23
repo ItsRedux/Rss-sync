@@ -94,7 +94,7 @@ var runCmd = &cobra.Command{
 				{
 					As:      "http",
 					Name:    "http",
-					Version: "0.0.1",
+					Version: "0.0.2",
 				},
 				{
 					Name:    "trello",
@@ -103,7 +103,7 @@ var runCmd = &cobra.Command{
 				},
 				{
 					Name:    "jira",
-					Version: "0.1.0",
+					Version: "0.3.0",
 					As:      "jira",
 				},
 				{
