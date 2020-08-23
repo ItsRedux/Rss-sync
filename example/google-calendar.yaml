@@ -12,10 +12,6 @@ trello: &trello
       {{ if .event.hangoutLink }}
       Dail: {{ .event.hangoutLink }}
       {{ end }}
-      {{ if .event.description }}
-      Description:
-      {{ .event.description | strings.Trunc 5000  }}
-      {{ end }}
       {{ .event }}
 
 calendar: &calendar
