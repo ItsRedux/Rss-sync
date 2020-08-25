@@ -84,18 +84,18 @@ sources:
 
 
 bindings:
-# - name: Personal-Necessity
-#   source: Personal-Necessity
-#   target: Personal-Necessity
+- name: Personal-Necessity
+  source: Personal-Necessity
+  target: Personal-Necessity
 - name: Personal-Effectivness
   source: Personal-Effectivness
   target: Personal-Effectivness
-# - name: Personal-Distruction
-#   source: Personal-Distruction
-#   target: Personal-Distruction
-# - name: Business
-#   source: Business
-#   target: Business
-# - name: Kubernetes-SIG-CLI
-#   source: Kubernetes-SIG-CLI
-#   target: Kubernetes-SIG-CLI
+- name: Personal-Distruction
+  source: Personal-Distruction
+  target: Personal-Distruction
+- name: Business
+  source: Business
+  target: Business
+- name: Kubernetes-SIG-CLI
+  source: Kubernetes-SIG-CLI
+  target: Kubernetes-SIG-CLI
