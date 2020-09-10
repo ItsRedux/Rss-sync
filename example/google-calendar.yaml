@@ -49,7 +49,7 @@ targets:
         labels:
           - 5cdab1c291d0c2ddc5905aa3 # effectivness
           - 5cdafe92e62c1855c4ce9ae2 # codefresh
-  - name: Kubernetes-SIG-CLI
+  - name: OpenSource
     trello:
       <<: *trello
       card:
@@ -81,6 +81,10 @@ sources:
   google-calendar:
     <<: *calendar
     calendar-id: 'kubernetes.io_hkd7n7n8vidt9joemmvkkeso3s@group.calendar.google.com'
+- name: ArgoCD
+  google-calendar:
+    <<: *calendar
+    calendar-id: 'argoproj@gmail.com'
 
 
 bindings:
@@ -98,4 +102,7 @@ bindings:
   target: Business
 - name: Kubernetes-SIG-CLI
   source: Kubernetes-SIG-CLI
-  target: Kubernetes-SIG-CLI
+  target: OpenSource
+- name: ArgoCD
+  source: ArgoCD
+  target: OpenSource
