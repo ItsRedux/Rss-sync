@@ -2,9 +2,9 @@ bindings:
 - name: Mentioned
   source: Mentioned
   target: Mentioned
-- name: Watching
-  source: Watching
-  target: Watching
+# - name: Watching
+#   source: Watching
+#   target: Watching
 
 trello: &trello
   token: '{{ env.Getenv "TRELLO_TOKEN" }}'
